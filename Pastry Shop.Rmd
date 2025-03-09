@@ -1,0 +1,41 @@
+---
+title: "Untitled"
+author: "Mineth"
+date: "2024-05-04"
+output: pdf_document
+---
+```{r}
+library(tidyverse)
+library(simmer)
+library(simmer.plot)
+library(gridExtra)
+```
+
+```{r}
+set.seed(123)
+env <- simmer("Pastry_Shop")  #Simulation environment called "pastry_Shop"
+
+# Trajectory for customer
+customer <- trajectory("customer") %>%
+  seize("employee", 1) %>%
+  timeout(function() runif(1, 1, 5)) %>%
+  release("employee", 1)
+
+env %>%
+  add_resource("employee", 3) %>%
+  add_generator("customer", customer, function() rexp(1, 1/2))
+
+env %>%
+  run(until = 120)
+```
+
+```{r}
+plot1 <- plot(get_mon_resources(env), metric = "usage", steps = T)
+plot1
+```
+```{r}
+plot2 <- plot(get_mon_arrivals(env))
+plot2
+```
+
+
